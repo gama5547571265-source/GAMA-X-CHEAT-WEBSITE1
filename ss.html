@@ -1,0 +1,406 @@
+    <!DOCTYPE html>
+    <html lang="ar" dir="rtl">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>GAMA STORE - متجر الألعاب الاحترافي</title>
+<script type='text/javascript'>
+
+document.write(unescape('%3C%6C%69%6E%6B%20%72%65%6C%3D%22%73%74%79%6C%65%73%68%65%65%74%22%20%68%72%65%66%3D%22%73%74%79%6C%65%2E%63%73%73%22%3E'));
+</script>
+
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+        
+        <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    </head>
+    <body>
+        <!-- شاشة تسجيل الدخول -->
+        <div id="loginScreen" class="login-screen">
+            <div class="login-container">
+                <div class="login-header">
+                    <i class="fas fa-gamepad"></i>
+                    <h1>GAMA STORE</h1>
+                    <p>متجر الألعاب الاحترافي</p>
+                </div>
+                
+                <form id="loginForm" class="login-form">
+                    <div class="form-group">
+                        <label for="email"><i class="fas fa-envelope"></i> البريد الإلكتروني</label>
+                        <input type="email" id="email" required placeholder="ادخل بريدك الإلكتروني">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="password"><i class="fas fa-lock"></i> كلمة المرور</label>
+                        <input type="password" id="password" required placeholder="ادخل كلمة المرور">
+                    </div>
+                    
+                    <button type="submit" class="btn primary login-btn">
+                        <i class="fas fa-sign-in-alt"></i> تسجيل الدخول
+                    </button>
+                    
+                    <div class="login-footer">
+                        <p>ليس لديك حساب؟ <a href="#" id="showRegister">سجل الآن</a></p>
+                    </div>
+                </form>
+                
+                <form id="registerForm" class="login-form hidden">
+                    <div class="form-group">
+                        <label for="regName"><i class="fas fa-user"></i> الاسم الكامل</label>
+                        <input type="text" id="regName" required placeholder="ادخل اسمك الكامل">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="regEmail"><i class="fas fa-envelope"></i> البريد الإلكتروني</label>
+                        <input type="email" id="regEmail" required placeholder="ادخل بريدك الإلكتروني">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="regPassword"><i class="fas fa-lock"></i> كلمة المرور</label>
+                        <input type="password" id="regPassword" required placeholder="ادخل كلمة المرور (6 أحرف على الأقل)">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="regPhone"><i class="fas fa-phone"></i> رقم الهاتف</label>
+                        <input type="tel" id="regPhone" required placeholder="ادخل رقم هاتفك">
+                    </div>
+                    
+                    <button type="submit" class="btn primary login-btn">
+                        <i class="fas fa-user-plus"></i> إنشاء حساب
+                    </button>
+                    
+                    <div class="login-footer">
+                        <p>لديك حساب بالفعل؟ <a href="#" id="showLogin">سجل الدخول</a></p>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- الموقع الرئيسي (مخفي حتى تسجيل الدخول) -->
+        <div id="mainSite" class="hidden">
+            <header class="header">
+                <nav class="nav">
+                    <div class="logo">
+                        <i class="fas fa-gamepad"></i>
+                        <span>GAMA STORE</span>
+                    </div>
+                    <div class="nav-links">
+                        <a href="#home" class="active">الرئيسية</a>
+                        <a href="#products">المنتجات</a>
+                        <a href="#about">من نحن</a>
+                        <a href="#testimonials">آراء العملاء</a>
+                        <a href="#contact">اتصل بنا</a>
+                    </div>
+    <div class="nav-actions">
+        <div class="user-profile">
+            <button class="profile-btn">
+                <i class="fas fa-user"></i>
+                <span id="userName">المستخدم</span>
+            </button>
+            <div class="profile-dropdown">
+                <div class="profile-info">
+                    <strong id="dropdownUserName">المستخدم</strong>
+                    <span id="dropdownUserEmail">user@example.com</span>
+                </div>
+                <a href="#" class="profile-link" id="openProfile">
+                    <i class="fas fa-user-cog"></i> الملف الشخصي
+                </a>
+                <button id="logoutBtn" class="logout-btn">
+                    <i class="fas fa-sign-out-alt"></i> تسجيل الخروج
+                </button>
+            </div>
+        </div>
+        <button class="cart-btn">
+            <i class="fas fa-shopping-cart"></i>
+            <span class="cart-count">0</span>
+        </button>
+        <button class="theme-toggle">
+            <i class="fas fa-moon"></i>
+        </button>
+    </div>
+                </nav>
+            </header>
+            
+    <section id="home" class="hero">
+        <div class="hero-content">
+            <h1 class="hero-title">ارتقِ بمستوى ألعابك</h1>
+            <p class="hero-description">اكتشف أحدث منتجات الألعاب والتعزيزات الرقمية لتتفوق على المنافسين</p>
+            <div class="hero-buttons">
+                <a href="#products" class="btn primary">تسوق الآن</a>
+                <a href="#about" class="btn secondary">اعرف المزيد</a>
+            </div>
+        </div>
+        <div class="hero-image">
+            <!-- الصورة مع نفس تأثير الكارد العائم -->
+            <div class="floating-image-container">
+                <img src="https://yt3.googleusercontent.com/vWqEho11wngt1Eei_v73K2Jurqm-oCV3GqopCY5PIj7FAkdXTegOHpCXrznGNHeLOeOj-bcC=s160-c-k-c0x00ffffff-no-rj" alt="GAMA STORE - متجر الألعاب" class="floating-hero-image">
+                <div class="image-glow"></div>
+            </div>
+                    </div> <!-- إغلاق mainSite -->
+
+        <!-- أضف هذا الكود هنا -->
+        <!-- نظام الدردشة -->
+        <div class="chat-widget">
+            <div class="chat-button" id="chatToggle">
+                <i class="fas fa-comments"></i>
+                <span class="chat-notification-badge hidden">1</span>
+            </div>
+            <div class="chat-container" id="chatContainer">
+                <div class="chat-header">
+                    <h4><i class="fas fa-headset"></i> الدعم الفني</h4>
+                    <button class="close-chat"><i class="fas fa-times"></i></button>
+                </div>
+                <div class="chat-messages" id="chatMessages">
+                    <div class="message support">
+                        <div class="message-text">مرحباً! كيف يمكنني مساعدتك اليوم؟</div>
+                        <div class="message-time">الآن</div>
+                    </div>
+                </div>
+                <div class="chat-input">
+                    <input type="text" id="messageInput" placeholder="اكتب رسالتك هنا..." maxlength="500">
+                    <button id="sendMessage"><i class="fas fa-paper-plane"></i></button>
+                </div>
+            </div>
+        </div>
+
+        </div>
+    </section>
+ 
+            <section id="about" class="about">
+                <div class="container">
+                    <h2 class="section-title">من نحن</h2>
+                    <div class="about-content">
+                        <div class="about-text">
+                            <h3>GAMA STORE - متجرك الموثوق لشحن الألعاب</h3>
+                            <p>نحن متجر رائد في مجال شحن العملات الرقمية للألعاب، نقدم خدمات موثوقة وسريعة لعشاق الألعاب في مصر والعالم العربي.</p>
+                            
+                            <div class="features-grid">
+                                <div class="feature-item">
+                                    <i class="fas fa-shield-alt"></i>
+                                    <h4>آمن وموثوق</h4>
+                                    <p>خدماتنا مضمونة 100% مع ضمان استرجاع</p>
+                                </div>
+                                <div class="feature-item">
+                                    <i class="fas fa-bolt"></i>
+                                    <h4>توصيل فوري</h4>
+                                    <p>شحن خلال دقائق بعد التأكد من الدفع</p>
+                                </div>
+                                <div class="feature-item">
+                                    <i class="fas fa-headset"></i>
+                                    <h4>دعم فني 24/7</h4>
+                                    <p>فريق دعم متاح على مدار الساعة</p>
+                                </div>
+                            </div>
+
+                            <div class="contact-info">
+                                <h4>تواصل معنا:</h4>
+                                <div class="contact-methods">
+                                    <a href="https://wa.me/201011907743" class="contact-btn">
+                                        <i class="fab fa-whatsapp"></i>
+                                        واتساب جاما
+                                    </a>
+                                    <a href="https://wa.me/201011907743" class="contact-btn">
+                                        <i class="fab fa-whatsapp"></i>
+                                        واتساب جاما
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+ 
+            <section id="products" class="products">
+    <div class="container">
+        <h2 class="section-title">منتجاتنا المميزة</h2>
+        
+        <!-- أزرار التصفية -->
+        <div class="filter-buttons">
+            <button class="filter-btn active" data-filter="all">
+                <i class="fas fa-th-large"></i> الكل
+            </button>
+            <button class="filter-btn" data-filter="pc">
+                <i class="fab fa-windows"></i> PC
+            </button>
+            <button class="filter-btn" data-filter="ios">
+                <i class="fab fa-apple"></i> iOS
+            </button>
+            <button class="filter-btn" data-filter="android">
+                <i class="fab fa-android"></i> Android
+            </button>
+        </div>
+        
+        <div class="products-grid" id="productsGrid">
+            <div class="loading-product">
+                <i class="fas fa-spinner fa-spin"></i>
+                <p>جاري تحميل المنتجات...</p>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- 
+            <section id="products" class="products">
+                <div class="container">
+                    <h2 class="section-title">منتجاتنا المميزة</h2>
+                    <div class="products-grid" id="productsGrid">
+                        <div class="loading-product">
+                            <i class="fas fa-spinner fa-spin"></i>
+                            <p>جاري تحميل المنتجات...</p>
+                        </div>
+                    </div>
+                </div>
+            </section> -->
+
+            <section id="testimonials" class="testimonials">
+                <div class="container">
+                    <h2 class="section-title">آراء العملاء</h2>
+                    
+                    <div class="add-testimonial-form">
+                        <h3>شاركنا برأيك</h3>
+                        <form id="testimonialForm">
+                            <div class="form-group">
+                                <label for="customerName">اسمك:</label>
+                                <input type="text" id="customerName" required placeholder="اكتب اسمك هنا">
+                            </div>
+                            <div class="form-group">
+                                <label for="customerReview">رأيك:</label>
+                                <textarea id="customerReview" required placeholder="اكتب رأيك عن خدماتنا..." rows="4"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label>تقييمك:</label>
+                                <div class="rating-stars">
+                                    <span class="star" data-rating="1">★</span>
+                                    <span class="star" data-rating="2">★</span>
+                                    <span class="star" data-rating="3">★</span>
+                                    <span class="star" data-rating="4">★</span>
+                                    <span class="star" data-rating="5">★</span>
+                                </div>
+                                <input type="hidden" id="ratingValue" value="0">
+                            </div>
+                            <button type="submit" class="btn primary">إرسال الرأي</button>
+                        </form>
+                    </div>
+
+                    <div class="testimonials-grid" id="testimonialsGrid">
+                        <div class="loading-testimonials">
+                            <i class="fas fa-spinner fa-spin"></i>
+                            <p>جاري تحميل آراء العملاء...</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="contact" class="contact">
+                <div class="container">
+                    <h2 class="section-title">اتصل بنا</h2>
+                    <div class="contact-content">
+                        <div class="contact-info">
+                            <div class="contact-item">
+                                <i class="fab fa-whatsapp"></i>
+                                <div>
+                                    <h4>واتساب جاما</h4>
+                                    <a href="https://wa.me/201011907743">01011907743</a>
+                                </div>
+                            </div>
+                            <div class="contact-item">
+                                <i class="fab fa-whatsapp"></i>
+                                <div>
+                                    <h4>واتساب جاما</h4>
+                                    <a href="https://wa.me/201011907743">01011907743</a>
+                                </div>
+                            </div>
+                            <div class="contact-item">
+                                <i class="fas fa-clock"></i>
+                                <div>
+                                    <h4>ساعات العمل</h4>
+                                    <p>24/7 متاحون لخدمتك</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <footer class="footer">
+                <div class="container">
+                    <div class="footer-content">
+                        <div class="footer-section">
+                            <h3>GAMA STORE</h3>
+                            <p>متجرك الموثوق لشحن الألعاب</p>
+                        </div>
+                        <div class="footer-section">
+                            <h4>روابط سريعة</h4>
+                            <a href="#home">الرئيسية</a>
+                            <a href="#products">المنتجات</a>
+                            <a href="#about">من نحن</a>
+                            <a href="#contact">اتصل بنا</a>
+                        </div>
+                        <div class="footer-section">
+                            <h4>التواصل</h4>
+                            <a href="https://wa.me/201011907743">واتساب جاما</a>
+                            <a href="https://wa.me/201011907743">واتساب جاما</a>
+                        </div>
+                    </div>
+                    <div class="footer-bottom">
+                        <p>&copy; 2025 GAMA STORE. جميع الحقوق محفوظة</p>
+                    </div>
+                </div>
+            </footer>
+
+            <!-- مودال البروفايل -->
+            <div id="profileModal" class="modal-overlay">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3 class="modal-title"><i class="fas fa-user-cog"></i> الملف الشخصي</h3>
+                        <button class="close-modal">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    
+                    <form id="profileForm">
+                        <div class="form-group">
+                            <label for="profileName"><i class="fas fa-user"></i> الاسم الكامل</label>
+                            <input type="text" id="profileName" required placeholder="ادخل اسمك الكامل">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="profileEmail"><i class="fas fa-envelope"></i> البريد الإلكتروني</label>
+                            <input type="email" id="profileEmail" required placeholder="ادخل بريدك الإلكتروني" readonly>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="profilePhone"><i class="fas fa-phone"></i> رقم الهاتف</label>
+                            <input type="tel" id="profilePhone" required placeholder="ادخل رقم هاتفك">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="profileAddress"><i class="fas fa-map-marker-alt"></i> العنوان</label>
+                            <textarea id="profileAddress" rows="3" placeholder="ادخل عنوانك"></textarea>
+                        </div>
+                        
+                        <div class="modal-actions">
+                            <button type="button" class="modal-btn btn-cancel" id="closeProfile">إلغاء</button>
+                            <button type="submit" class="modal-btn btn-save">حفظ التغييرات</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <script>
+eval(function(p,a,c,k,e,r){e=function(c){return c.toString(a)};if(!''.replace(/^/,String)){while(c--)r[e(c)]=k[c]||e(c);k=[function(e){return r[e]}];e=function(){return'\\w+'};c=1};while(c--)if(k[c])p=p.replace(new RegExp('\\b'+e(c)+'\\b','g'),k[c]);return p}('4 5={8:"9",a:"0-2.b.c",d:"0-2",e:"0-2.f.g",h:"6",i:"1:6:j:k",l:"m-n"};7.o(5);4 3=7.p();q.3=3;',27,27,'gama||xiter|db|const|firebaseConfig|979348178199|firebase|apiKey|AIzaSyAd5KNh5H6KaQ9nv8FP3keyFRh28zSwfLM|authDomain|firebaseapp|com|projectId|storageBucket|firebasestorage|app|messagingSenderId|appId|web|dd66b3d0d00b76fe61a352|measurementId|G|4Q4P3GTJN5|initializeApp|firestore|window'.split('|'),0,{}))
+      </script>
+<script type='text/javascript'>
+
+document.write(unescape('%3C%73%63%72%69%70%74%20%73%72%63%3D%22%73%63%72%69%70%74%2E%6A%73%22%3E%3C%2F%73%63%72%69%70%74%3E'));
+
+</script>
+
+//جاما
+<script>
+  eval(function(p,a,c,k,e,r){e=function(c){return(c<a?'':e(parseInt(c/a)))+((c=c%a)>35?String.fromCharCode(c+29):c.toString(36))};if(!''.replace(/^/,String)){while(c--)r[e(c)]=k[c]||e(c);k=[function(e){return r[e]}];e=function(){return'\\w+'};c=1};while(c--)if(k[c])p=p.replace(new RegExp('\\b'+e(c)+'\\b','g'),k[c]);return p}('(o(){5(1.t===\'v:\'||1.w.x(\'y-z:\')){2.6.7=\'<0 8="9-a:b;d-f:g;">❌ تم إغلاق الصفحة لأسباب أمنية.</0>\';h(()=>{1.k(\'l:m\')},n)}2.p(\'A\',e=>e.q());2.p(\'B\',o(e){C 3=e.3.D();5((e.r&&3===\'u\')||3===\'E\'||(e.r&&e.F&&[\'i\',\'c\',\'j\'].G(3))){e.q();2.6.7=\'<0 8="9-a:b;d-f:g;">❌ الصفحة أغلقت لمحاولة عرض الكود.</0>\';h(()=>{1.k(\'l:m\')},n)}},H);I(()=>{5(4.J-4.K>s||4.L-4.M>s){2.6.7=\'<0 8="9-a:b;d-f:g;">🛑 تم إغلاق الصفحة.</0>\';h(()=>{1.k(\'l:m\')},n)}},N)})();',50,50,'h2|location|document|key|window|if|documentElement|innerHTML|style|text|align|center||margin||top|50px|setTimeout|||replace|about|blank|200|function|addEventListener|preventDefault|ctrlKey|180|protocol||file|href|startsWith|view|source|contextmenu|keydown|const|toLowerCase|f12|shiftKey|includes|true|setInterval|outerWidth|innerWidth|outerHeight|innerHeight|400'.split('|'),0,{}))
+</script>
+    </body>
+    </html>
